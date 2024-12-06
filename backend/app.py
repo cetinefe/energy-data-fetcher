@@ -99,7 +99,7 @@ def extract_area_codes():
     response = requests.post('https://newtransparency.entsoe.eu/enum/list', cookies=cookies, headers=headers, json=json_data)
     response.raise_for_status()
     areas = response.json()["enumList"][0]["attributeEnum"]
-    
+    print(areas)
     return areas
     
 def transform_area_codes(areas):
