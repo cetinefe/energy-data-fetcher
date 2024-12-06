@@ -46,7 +46,7 @@ def data_main(day_range, area_type_input, areas):
         # Data Extraction for Area Type one by one for each Area
         table = {}
         extracted_areas = set()
-        for area in areas_filtered:  # add [:4] to the right if you want to try a sample of 4
+        for area in areas_filtered:  # add [:4] to the right if you want to test a sample of size 4
             if area['code'] not in extracted_areas:
                 status['print_content_3'] += f" ... {area['name']} ... {area['code']} ...\n"
                 extracted_areas.add(area['code'])
@@ -184,13 +184,13 @@ def load(load_frame):
     try:
         with mysql.connector.connect(**db_config) as connection:
             if connection.is_connected():
-                data_to_insert = load_frame.values.tolist()
                 print("Connected to MySQL database")
+                data_to_insert = load_frame.values.tolist()
                 cursor = connection.cursor()
 
                 # Fetch the inserted rows
                 for row in data_to_insert:
-                    cursor.execute("SELECT * FROM power WHERE DATE_AREA_KEY = %s", (row[0],))
+                    cursor.execute("SELECT * FROM gender_schema.power WHERE DATE_AREA_KEY = %s", (row[0],))
                     result = cursor.fetchone()
                     if result:
                         inserted_keys.append(row[0])
