@@ -175,7 +175,7 @@ def transform(table, start_day, end_day, day_range):
 def load(load_frame):
     db_config = {
         'user': 'root',
-        'password': '20E30f21e79_',
+        'password': '4512Pk__',
         'host': '127.0.0.1',
         'database': 'gender_schema'
     }
@@ -202,6 +202,7 @@ def load(load_frame):
                 cursor.executemany(insert_query, data_to_insert)
                 connection.commit()
                 print("Data inserted into MySQL database successfully!")
+                print(inserted_keys)
                 
     except Error as e:
         print(f"Error: {e}")
