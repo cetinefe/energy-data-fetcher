@@ -190,7 +190,7 @@ def load(load_frame):
 
                 # Fetch the inserted rows
                 for row in data_to_insert:
-                    cursor.execute("SELECT * FROM gender_schema.power WHERE DATE_AREA_KEY = %s", (row[0],))
+                    cursor.execute("SELECT * FROM power WHERE DATE_AREA_KEY = %s", (row[0],))
                     result = cursor.fetchone()
                     if result:
                         inserted_keys.append(row[0])
