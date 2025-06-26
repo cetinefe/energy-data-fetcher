@@ -46,7 +46,7 @@ def data_main(day_range, area_type_input, areas):
         # Data Extraction for Area Type one by one for each Area
         table = {}
         extracted_areas = set()
-        for area in areas_filtered:  # add [:4] to the right if you want to test a sample of size 4
+        for area in areas_filtered:
             if area['code'] not in extracted_areas:
                 status['print_content_3'] += f" ... {area['name']} ... {area['code']} ...\n"
                 extracted_areas.add(area['code'])
@@ -222,7 +222,7 @@ def index():
 def fetch_area_codes():
     try:
         areas = extract_area_codes()
-        area_types = transform_area_codes(areas) # Print Area Type Table
+        area_types = transform_area_codes(areas)  # Print Area Type Table
         return jsonify({'status': 'success', 'area_types': area_types, 'areas': areas})
     except Exception as e:
         print(f"Error: {e}")  # Print the error message for debugging
