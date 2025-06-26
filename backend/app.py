@@ -160,7 +160,7 @@ def transform(table, start_day, end_day, day_range):
         for i, (key, values) in enumerate(data.items()):
             if i >= len(date_time):
                 break
-            dt = date_time[i]
+            dt = date_time[i].to_pydatetime()
             total_load = values[0] if isinstance(values[0], str) else values[0].get('alt', None)
             da_forecast = values[1] if isinstance(values[1], str) else values[1].get('alt', None)
             flattened_table.append((dt, total_load, da_forecast, area_code, area_name))
