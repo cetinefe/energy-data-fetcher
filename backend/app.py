@@ -165,6 +165,7 @@ def transform(table, start_day, end_day, day_range):
             da_forecast = values[1] if isinstance(values[1], str) else values[1].get('alt', None)
             flattened_table.append((dt, total_load, da_forecast, area_code, area_name))
     load_frame = pd.DataFrame(flattened_table, columns=["DateTime", "Total_Load", "DA_Forecast", "Area_Code", "Area_Name"])
+    load_frame["DateTime"] = load_frame["DateTime"].apply(lambda x: x.to_pydatetime() if hasattr(x, "to_pydatetime") else x)
     load_frame["DATE_AREA_KEY"] = load_frame["DateTime"].astype(str) + "_" + load_frame["Area_Code"]
     load_frame = load_frame[["DATE_AREA_KEY", "DateTime", "Total_Load", "DA_Forecast", "Area_Code", "Area_Name"]]
     load_frame['Total_Load'] = load_frame["Total_Load"].apply(lambda x: float(x) if isinstance(x, (int, float, str)) and str(x).replace('.', '', 1).isdigit() else None)
