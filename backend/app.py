@@ -180,39 +180,61 @@ def load(load_frame):
         'host': '127.0.0.1',
         'database': 'gender_schema'
     }
-    data_to_insert = []
     inserted_keys = []
+
     try:
         with mysql.connector.connect(**db_config) as connection:
             if connection.is_connected():
                 print("Connected to MySQL database")
-                data_to_insert = load_frame.values.tolist()
                 cursor = connection.cursor()
 
-                # Fetch the inserted rows
-                for row in data_to_insert:
-                    cursor.execute("SELECT * FROM power WHERE DATE_AREA_KEY = %s", (row[0],))
-                    result = cursor.fetchone()
-                    if result:
-                        inserted_keys.append(row[0])
+                # Safely prepare the data
+                data_to_insert = []
+                for row in load_frame.itertuples(index=False):
+                    try:
+                        dt = row.DateTime
+                        if isinstance(dt, pd.Timestamp):
+                            dt = dt.to_pydatetime()
+                        elif not isinstance(dt, datetime.datetime):
+                            raise TypeError(f"Invalid datetime type: {type(dt)}")
 
-                # Inserting data
-                insert_query = """INSERT IGNORE INTO power 
-                                  (DATE_AREA_KEY, Date_Time, Total_Load, DA_Forecast, Area_Code, Area_Name) 
-                                  VALUES (%s, %s, %s, %s, %s, %s)"""               
+                        data_tuple = (
+                            row.DATE_AREA_KEY,
+                            dt,
+                            float(row.Total_Load),
+                            float(row.DA_Forecast),
+                            row.Area_Code,
+                            row.Area_Name
+                        )
+                        data_to_insert.append(data_tuple)
+
+                        # Check for duplicates
+                        cursor.execute("SELECT 1 FROM power WHERE DATE_AREA_KEY = %s", (row.DATE_AREA_KEY,))
+                        if cursor.fetchone():
+                            inserted_keys.append(row.DATE_AREA_KEY)
+                    except Exception as e:
+                        print(f"Skipping row due to error: {e}\nRow: {row}")
+
+                # Insert new data
+                insert_query = """
+                    INSERT IGNORE INTO power 
+                    (DATE_AREA_KEY, Date_Time, Total_Load, DA_Forecast, Area_Code, Area_Name)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """
                 cursor.executemany(insert_query, data_to_insert)
                 connection.commit()
                 print("Data inserted into MySQL database successfully!")
-                print(inserted_keys)
-                
+                print(f"Ignored (existing) keys: {inserted_keys}")
+
     except Error as e:
-        print(f"Error: {e}")
-        
+        print(f"MySQL Error: {e}")
+
     finally:
         if 'connection' in locals() and connection.is_connected():
             cursor.close()
             connection.close()
             print("MySQL connection closed")
+
     return inserted_keys
 
 @app2.route('/')
